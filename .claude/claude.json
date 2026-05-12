@@ -1,0 +1,44 @@
+{
+  "name": "Clearout AI",
+  "version": "1.0",
+  "description": "AI-powered household inventory and listing app. Users upload photos of items, AI extracts metadata, and app helps organize keep/sell/donate decisions with AI-generated listing drafts.",
+  "purpose": "This is a learning project for a summer internship recruiting prep. Prioritize learning and explaining every line of code.",
+  "modelPreferences": {
+    "default": "claude-sonnet-4-20250514",
+    "coding": "claude-sonnet-4-20250514"
+  },
+  "rulesDirectories": [
+    ".claude/rules"
+  ],
+  "contextDirectories": [
+    ".claude/context"
+  ],
+  "instructionsForClaude": "This student is learning software engineering. For EVERY code you generate: (1) Explain what it does, (2) Walk through it line by line, (3) Explain the why behind design decisions, (4) Show alternatives and tradeoffs, (5) Ask if they understand before moving on. Learning is the goal, not speed.",
+  "techStack": {
+    "frontend": "Next.js 14, React, TypeScript, Tailwind CSS",
+    "backend": "Next.js API Routes, Node.js",
+    "database": "Supabase PostgreSQL with Row Level Security (RLS)",
+    "storage": "Supabase Storage for item photos",
+    "ai": "Google Gemini 1.5 Flash Vision API",
+    "deployment": "Vercel",
+    "testing": "Vitest + React Testing Library",
+    "validation": "Zod for schema validation",
+    "auth": "Supabase Auth",
+    "forms": "React Hook Form"
+  },
+  "keyArchitectureDecisions": [
+    "Async job pipeline: AI processing happens in background, not on user request",
+    "RLS on all tables: Each user can only see their own data at database level",
+    "Zod validation: All AI outputs and user inputs validated against schemas",
+    "Structured extraction: AI returns JSON that matches a schema"
+  ],
+  "learningGoals": [
+    "Understand TypeScript deeply",
+    "Master async/await and background jobs",
+    "Learn React hooks and state management",
+    "Understand database security (RLS)",
+    "Learn how to call external APIs safely",
+    "Master error handling and edge cases",
+    "Understand the full stack"
+  ]
+}

@@ -1,44 +1,85 @@
 {
   "name": "Clearout AI",
-  "version": "1.0",
-  "description": "AI-powered household inventory and listing app. Users upload photos of items, AI extracts metadata, and app helps organize keep/sell/donate decisions with AI-generated listing drafts.",
-  "purpose": "This is a learning project for a summer internship recruiting prep. Prioritize learning and explaining every line of code.",
+  "version": "2.0",
+  "description": "AI-powered household inventory and listing app. Users upload photos of items, AI extracts metadata (name, category, condition, price estimate), and generates sale listings for Marketplace/eBay.",
+  "purpose": "Dario's primary summer recruiting project. Full-stack engineering (frontend, backend, database, external AI API) + Product Management (user research, MVP definition, metrics tracking). Learning goal: deep understanding of every line of code and product thinking.",
+  "status": "Phase 3 - July 2026. Building MVP features. Focus: clean code + product validation.",
   "modelPreferences": {
     "default": "claude-sonnet-4-20250514",
     "coding": "claude-sonnet-4-20250514"
   },
-  "rulesDirectories": [
-    ".claude/rules"
-  ],
-  "contextDirectories": [
-    ".claude/context"
-  ],
-  "instructionsForClaude": "This student is learning software engineering. For EVERY code you generate: (1) Explain what it does, (2) Walk through it line by line, (3) Explain the why behind design decisions, (4) Show alternatives and tradeoffs, (5) Ask if they understand before moving on. Learning is the goal, not speed.",
+  "rulesDirectories": [".claude/rules"],
+  "contextDirectories": [".claude/context"],
+  "instructionsForClaude": "Dario is learning full-stack engineering + product management. For EVERY code or decision: (1) Explain what/why, (2) Walk through line by line, (3) Show design tradeoffs, (4) Ask if he understands. Learning is the goal — he should understand every decision. Also think like a PM: What problem does this solve? Who wants it? How do we measure success?",
   "techStack": {
     "frontend": "Next.js 14, React, TypeScript, Tailwind CSS",
     "backend": "Next.js API Routes, Node.js",
     "database": "Supabase PostgreSQL with Row Level Security (RLS)",
     "storage": "Supabase Storage for item photos",
     "ai": "Google Gemini 1.5 Flash Vision API",
+    "auth": "Supabase Auth (email/password + Google OAuth)",
     "deployment": "Vercel",
     "testing": "Vitest + React Testing Library",
     "validation": "Zod for schema validation",
-    "auth": "Supabase Auth",
     "forms": "React Hook Form"
   },
   "keyArchitectureDecisions": [
     "Async job pipeline: AI processing happens in background, not on user request",
-    "RLS on all tables: Each user can only see their own data at database level",
+    "Row Level Security (RLS): Each user can only see their own data at database level",
     "Zod validation: All AI outputs and user inputs validated against schemas",
-    "Structured extraction: AI returns JSON that matches a schema"
+    "Structured extraction: Gemini returns JSON that matches a schema with fallbacks"
   ],
-  "learningGoals": [
-    "Understand TypeScript deeply",
-    "Master async/await and background jobs",
-    "Learn React hooks and state management",
-    "Understand database security (RLS)",
-    "Learn how to call external APIs safely",
-    "Master error handling and edge cases",
-    "Understand the full stack"
-  ]
+  "gitWorkflow": {
+    "mainBranch": "main - always deployable, merges via PR only",
+    "workingBranch": "dev - daily work, pushed frequently",
+    "commitStyle": "Conventional commits (feat:, fix:, test:, docs:, chore:). No AI/Claude attribution. No em dashes."
+  },
+  "metricsToTrack": {
+    "productMetrics": [
+      "Signups (email waitlist)",
+      "Active users (people who used the app)",
+      "Items processed (total items extracted)",
+      "Time per item (minutes to list)",
+      "Engagement (% of signups who actually use)",
+      "Satisfaction (rating / NPS)"
+    ],
+    "engineeringMetrics": [
+      "Test coverage: 80%+",
+      "Commit quality: clear messages",
+      "Deployment frequency: daily or more",
+      "Zero security vulnerabilities"
+    ]
+  },
+  "currentPhase": "Phase 3 - MVP Polish & Launch",
+  "currentWeek": "July 8, 2026",
+  "nextMilestones": [
+    "Landing page with working email waitlist",
+    "Gemini Vision API integration",
+    "Dashboard showing user items",
+    "Job pipeline for async processing"
+  ],
+  "learningGoals": {
+    "engineering": [
+      "Understand TypeScript deeply (types, interfaces, generics)",
+      "Master async/await and background jobs",
+      "Learn React hooks and state management",
+      "Understand Row Level Security (RLS)",
+      "Learn to call external APIs safely",
+      "Master error handling and retries",
+      "Full stack: frontend → API → database → external API"
+    ],
+    "productManagement": [
+      "Interview users effectively",
+      "Define MVP (simplest version that works)",
+      "Write PRDs",
+      "Track metrics (users, engagement, not just features)",
+      "Iterate based on feedback",
+      "Make tradeoff decisions"
+    ]
+  },
+  "recruitingSignals": {
+    "engineering": "Full-stack depth, async patterns, security (RLS), external API integration",
+    "productManagement": "User research, MVP thinking, metrics tracking, iteration",
+    "github": "Clean commits, semantic PRs, main always works"
+  }
 }

@@ -3,5 +3,8 @@
     "allow": [
       "WebFetch(domain:www.amazon.com)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "chrome-devtools"
+  ]
 }

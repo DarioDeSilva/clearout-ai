@@ -1,5 +1,6 @@
 import { GoogleGenAI, createUserContent, createPartFromBase64, createPartFromText } from "@google/genai";
 import { itemExtractionSchema, type ItemExtraction } from "@/lib/validators";
+import type { PricingComputation, ItemPricingContext } from "@/lib/pricing";
 
 // gemini-2.5-flash is deprecated for new API keys (still listed by the
 // models endpoint, but generateContent 404s on it) — gemini-3.5-flash is
@@ -50,6 +51,62 @@ export async function extractItemFromPhoto(
     return itemExtractionSchema.parse(parsed);
   } catch (error) {
     console.error("Item extraction failed:", error);
+    throw error;
+  }
+}
+
+const EXPLANATION_INSTRUCTIONS = `You will be given already-computed pricing numbers for a secondhand item.
+Write ONE short paragraph explaining the recommendation in this exact style:
+
+"Recommended listing price: $575 OBO. Expected selling range: $475-$550. Quick-sale price: $425. Based on 14 comparable listings. The estimate was reduced because the item requires buyer removal and the available comparisons were active asking prices rather than confirmed sales."
+
+Rules:
+- Use ONLY the numbers given to you. Do not calculate, adjust, or invent any number.
+- Mention the comp count and comp quality note given to you.
+- Keep it to 2-3 sentences, plain prose, no markdown, no bullet points.
+- Respond with ONLY the explanation text, nothing else.`;
+
+/**
+ * Turns already-computed numbers into a one-paragraph explanation. This is
+ * the ONLY place an LLM touches pricing, and it never sees raw eBay data
+ * or does arithmetic — it's handed final numbers and asked to phrase them.
+ * The numbers shown in the UI always come from `computation` directly,
+ * never parsed back out of this text, so even if the model's prose drifts
+ * slightly it can't corrupt the actual displayed price.
+ */
+export async function explainPricing(
+  computation: PricingComputation,
+  itemContext: ItemPricingContext,
+): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY not set in environment");
+  }
+
+  const facts = `Item: ${itemContext.name} (${itemContext.category}, ${itemContext.condition} condition)
+Recommended listing price: $${computation.recommendedPrice} ${computation.oboOrFirm === "obo" ? "OBO" : "firm"}
+Expected selling range: $${computation.expectedRangeLow}-$${computation.expectedRangeHigh}
+Quick-sale price: $${computation.quickSalePrice}
+Comps used: ${computation.compsUsed}
+Comp quality note: ${computation.compsQualityNote}
+Confidence: ${computation.confidence}`;
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const response = await ai.models.generateContent({
+      model: MODEL,
+      contents: createUserContent([createPartFromText(`${EXPLANATION_INSTRUCTIONS}\n\n${facts}`)]),
+    });
+
+    const text = response.text?.trim();
+    if (!text) {
+      throw new Error("Gemini returned an empty explanation");
+    }
+
+    return text;
+  } catch (error) {
+    console.error("Pricing explanation generation failed:", error);
     throw error;
   }
 }

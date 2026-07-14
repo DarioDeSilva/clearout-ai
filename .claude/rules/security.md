@@ -46,15 +46,22 @@ if (!process.env.GEMINI_API_KEY) {
 
 ```typescript
 export async function POST(req: Request) {
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   // Process request as authenticated user
 }
 ```
+
+Use `getUser()`, not `getSession()`, on the server. `getSession()` just
+reads whatever's in the cookie without checking it's still valid;
+`getUser()` re-validates the token against Supabase's Auth server. On the
+server, where the cookie could in principle be tampered with, that
+difference matters. (Corrected 2026-07-13 — the app's actual auth code in
+`app/dashboard/layout.tsx` uses `getUser()`.)
 
 ## Row Level Security (RLS)
 

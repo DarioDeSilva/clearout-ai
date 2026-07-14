@@ -21,54 +21,37 @@ YES: "Simplest thing that shows whether users will use it"
 ### Clearout AI MVP
 
 **Must have:**
-- Landing page + email waitlist
-- Upload photo → AI extracts metadata
-- Edit extracted data
-- Copy listing text to clipboard
+- Email/password sign-in, protected dashboard
+- Projects to organize items (default project auto-created on signup)
+- Upload photo → AI extracts item details
+- Confirm/edit details AI can't see (age, defects, accessories, original
+  price)
+- Keep / sell / donate / trash decision per item
+- Seller preferences + comp-grounded price recommendation for items
+  marked "sell"
+- AI-generated listing with an explicit "Regenerate" button
+- Copy-to-clipboard + deep link to Facebook Marketplace, eBay, Craigslist
 
 **NOT in MVP:**
-- Authentication
+- Google OAuth (email/password only)
+- Multiple photos per item
+- Real marketplace auto-posting APIs (none are realistically available —
+  see `ARCHITECTURE.md`)
 - CSV export
-- Marketplace integration
 - Mobile app
+- Any paid tier
+
+(Revised 2026-07-13 after dropping the original waitlist-first plan — see
+`docs/PRD.md` for the full current picture.)
 
 ## PRD: Product Requirements Document
 
-A PRD defines what you're building.
+A PRD defines what you're building — structured as Problem, Solution,
+Target User, MVP Features, Explicitly Not in MVP, Success Criteria, and
+Timeline.
 
-```markdown
-# Clearout AI PRD
-
-## Problem
-Users spend 2+ hours manually listing 100 items for sale.
-
-## Solution
-Upload photo → AI generates title/description → copy to marketplace
-
-## Target User
-- Age: 25–55
-- Motivation: Moving, downsizing, decluttering
-- Pain: Time-consuming manual listing
-
-## MVP Features
-- Landing page
-- Email waitlist
-- Photo upload
-- AI item extraction
-- Edit extracted data
-- Copy listing to clipboard
-
-## Success Criteria
-- 50 waitlist signups
-- 10 beta users
-- 5+ items per user on average
-- 4+ star rating
-
-## Timeline
-Week 1: Landing page
-Week 2: Photo upload + Gemini integration
-Week 3: Edit UI + polish
-```
+Clearout AI's actual current PRD lives at `docs/PRD.md` — read that for
+the real, up-to-date version instead of a stale copy here.
 
 ## Customer Research
 
@@ -107,6 +90,24 @@ Every week, log:
 **Monday:** Review last week's metrics + feedback. Decide what to build.
 **Tuesday–Thursday:** Build feature + gather user feedback.
 **Friday:** Plan next week based on learnings.
+
+## Future Monetization Ideas (not built, noted for later)
+
+Discussed 2026-07-13 while deciding photo/listing scope. Core listing
+quality (photos, listing regeneration) should stay free — gating it would
+make the free tier feel deliberately broken, which drives churn instead
+of upgrades. Better premium levers, if it ever comes to that:
+
+- **Item/month volume caps** — scales with actual usage, not with a
+  feature that's core to listing quality.
+- **Listing regeneration caps** (e.g. 1 free regen/item, unlimited paid)
+  — ties the paywall to real marginal cost (Gemini calls).
+- **Real eBay auto-posting** (actual API integration instead of copy +
+  deep link) — genuinely more expensive to build (developer partnership,
+  OAuth), delivers a real step-change in time saved.
+- **Bulk/batch upload** — power-user behavior, real infra cost (this is
+  where the deferred async-worker architecture would actually earn its
+  keep), doesn't cripple a casual user doing a handful of items.
 
 ## Recruiting Signal
 

@@ -1,10 +1,18 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
+import { getItemPhotoUrl } from "@/lib/storage";
 import type { Project } from "@/types/project";
+import type { Item } from "@/types/item";
 import { DeleteProjectButton } from "./delete-project-button";
+import { UploadItemForm } from "./upload-item-form";
+import { ItemCard } from "./item-card";
 
 interface ProjectDetailPageProps {
   params: Promise<{ projectId: string }>;
+}
+
+interface ItemWithPhotos extends Item {
+  item_photos: { storage_path: string }[];
 }
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
@@ -26,12 +34,28 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     notFound();
   }
 
-  // head: true means "give me the count, not the rows" — no item data is
-  // actually fetched, just how many exist for this project.
-  const { count: itemCount } = await supabase
+  const { data: items, error } = await supabase
     .from("items")
-    .select("id", { count: "exact", head: true })
-    .eq("project_id", project.id);
+    .select(
+      "id, project_id, name, category, condition, brand, owned_since, notes, status, listing_title, listing_description, created_at, item_photos(storage_path)",
+    )
+    .eq("project_id", project.id)
+    .order("created_at", { ascending: false })
+    .returns<ItemWithPhotos[]>();
+
+  if (error) {
+    console.error("Failed to load items:", error.message);
+    throw new Error("Failed to load items");
+  }
+
+  const itemsWithPhotoUrls = await Promise.all(
+    items.map(async (item) => ({
+      item,
+      photoUrl: item.item_photos[0]
+        ? await getItemPhotoUrl(supabase, item.item_photos[0].storage_path)
+        : null,
+    })),
+  );
 
   return (
     <div>
@@ -40,12 +64,25 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         <DeleteProjectButton
           projectId={project.id}
           projectName={project.name}
-          itemCount={itemCount ?? 0}
+          itemCount={items.length}
         />
       </div>
-      <p className="mt-2 text-gray-600">
-        No items yet — photo upload is coming in the next milestone.
-      </p>
+
+      <div className="mt-4">
+        <UploadItemForm projectId={project.id} />
+      </div>
+
+      {items.length === 0 ? (
+        <p className="mt-6 text-gray-600">
+          No items yet — upload a photo above to add your first one.
+        </p>
+      ) : (
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {itemsWithPhotoUrls.map(({ item, photoUrl }) => (
+            <ItemCard key={item.id} item={item} projectId={project.id} photoUrl={photoUrl} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

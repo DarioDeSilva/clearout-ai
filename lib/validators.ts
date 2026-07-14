@@ -22,3 +22,19 @@ export const updateItemInputSchema = z.object({
   notes: z.string().max(2000).nullable().optional(),
   status: z.enum(["keep", "sell", "donate", "trash"]).optional(),
 });
+
+export const pricingPreferencesInputSchema = z.object({
+  sellingGoal: z.enum(["quick", "balanced", "maximize"]),
+  urgency: z.string().max(200).nullable(),
+  negotiable: z.boolean(),
+  oboOrFirm: z.enum(["obo", "firm"]),
+  minPrice: z.number().positive().nullable(),
+  zipCode: z.string().max(20).nullable(),
+  deliveryAvailable: z.boolean(),
+  removalDifficulty: z.string().max(200).nullable(),
+  pickupDeadline: z.string().max(50).nullable(),
+  willHold: z.boolean(),
+  undetectableDefects: z.string().max(2000).nullable(),
+});
+
+export type PricingPreferencesInput = z.infer<typeof pricingPreferencesInputSchema>;
